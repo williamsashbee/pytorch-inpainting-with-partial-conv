@@ -15,6 +15,8 @@ class Places2(torch.utils.data.Dataset):
         if split == 'train':
             self.paths = glob('{:s}/data_large/**/*.jpg'.format(img_root),
                               recursive=True)
+        elif split == 'demo':
+            self.paths = glob('{:s}/*.jpg'.format(img_root))
         else:
             self.paths = glob('{:s}/{:s}_large/*'.format(img_root, split))
 
