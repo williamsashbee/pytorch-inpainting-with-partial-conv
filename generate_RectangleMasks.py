@@ -8,15 +8,30 @@ action_list = [[0, 1], [0, -1], [1, 0], [-1, 0]]
 
 def random_rectangle(canvas):
     img_size = canvas.shape[-1]
-    xi = np.random.randint(0,img_size-50)
-    yi = np.random.randint(0,img_size-50)
+    xi = np.random.randint(0,img_size-(img_size/5))
+    yi = np.random.randint(0,img_size- (img_size/5))
 
-    xlen = np.random.randint(40,img_size-xi-1)
-    ylen = np.random.randint(40,img_size-yi-1)
+    xlen = np.random.randint(img_size/7,img_size)
+    ylen = np.random.randint(img_size/7,img_size)
 
-    if xlen*ylen> img_size**2/5.0:
-        xlen  = int(xlen/np.random.uniform(2,5))
-        ylen  = int(ylen/np.random.uniform(2,5))
+    while True:
+        if  xi+xlen > img_size:
+            xlen = int(xlen / 1.5)
+        elif yi + ylen > img_size:
+            ylen = int(ylen / 1.5)
+        else:
+            break
+
+    while True:
+        if xlen * ylen > img_size**2 / 3:
+            if np.random.random_sample() > .5:
+                xlen = int(xlen / 1.5)
+            else:
+                ylen = int(ylen / 1.5)
+        else:
+            break
+
+
 
 
     canvas[xi:(xi+xlen), yi:(yi+ylen)] = 0
@@ -29,7 +44,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--image_size', type=int, default=512)
     parser.add_argument('--N', type=int, default=10000)
-    parser.add_argument('--save_dir', type=str, default='mask')
+    parser.add_argument('--save_dir', type=str, default='mask-rect-large')
     args = parser.parse_args()
 
     if not os.path.exists(args.save_dir):
