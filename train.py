@@ -58,6 +58,10 @@ parser.add_argument('--resume', type=str)
 parser.add_argument('--finetune', action='store_true')
 args = parser.parse_args()
 
+import os
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"]="3"
+
 torch.backends.cudnn.benchmark = True
 device = torch.device('cuda')
 
@@ -70,11 +74,19 @@ if not os.path.exists(args.log_dir):
 writer = SummaryWriter(log_dir=args.log_dir)
 
 size = (args.image_size, args.image_size)
+
 img_tf = transforms.Compose(
-    [transforms.Resize(size=size), transforms.ToTensor(),
-     transforms.Normalize(mean=opt.MEAN, std=opt.STD)])
+    [
+        transforms.RandomRotation(30, resample=False, expand=False),
+        transforms.RandomResizedCrop(args.image_size, scale=(0.08, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=opt.MEAN, std=opt.STD)
+    ]
+)
+
 mask_tf = transforms.Compose(
-    [transforms.Resize(size=size), transforms.ToTensor()])
+    [transforms.Resize(size=size),
+     transforms.ToTensor()])
 
 dataset_train = Places2(args.root, args.mask_root, img_tf, mask_tf, 'train')
 dataset_val = Places2(args.root, args.mask_root, img_tf, mask_tf, 'val')
