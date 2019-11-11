@@ -60,7 +60,7 @@ args = parser.parse_args()
 
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
-os.environ["CUDA_VISIBLE_DEVICES"]="3"
+os.environ["CUDA_VISIBLE_DEVICES"]="4"
 
 torch.backends.cudnn.benchmark = True
 device = torch.device('cuda')
@@ -77,8 +77,9 @@ size = (args.image_size, args.image_size)
 
 img_tf = transforms.Compose(
     [
-        transforms.RandomRotation(30, resample=False, expand=False),
-        transforms.RandomResizedCrop(args.image_size, scale=(0.08, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2),
+        transforms.Resize(size=size),
+        transforms.RandomResizedCrop(args.image_size, scale=(0.5, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2),
+        transforms.RandomRotation(15, resample=False, expand=False),
         transforms.ToTensor(),
         transforms.Normalize(mean=opt.MEAN, std=opt.STD)
     ]

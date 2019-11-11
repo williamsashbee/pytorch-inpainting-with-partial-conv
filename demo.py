@@ -59,7 +59,7 @@ size = (args.image_size, args.image_size)
 
 img_tf = transforms.Compose(
     [
-
+        transforms.Resize(size=size),
         transforms.ToTensor(),
         transforms.Normalize(mean=opt.MEAN, std=opt.STD)
     ]
