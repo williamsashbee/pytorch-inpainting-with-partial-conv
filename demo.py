@@ -16,7 +16,7 @@ from util.image import unnormalize
 
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
-os.environ["CUDA_VISIBLE_DEVICES"]="3"
+os.environ["CUDA_VISIBLE_DEVICES"]="4"
 
 def demo(model, dataset, device, filename):
     image, mask, gt = zip(*[dataset[i] for i in range(1)])
@@ -39,20 +39,38 @@ parser = argparse.ArgumentParser()
 # training options
 parser.add_argument('--root', type=str, default='/home/washbee1/phone-images')
 parser.add_argument('--maskroot', type=str, default='/home/washbee1/masks')
-parser.add_argument('--snapshot', type=str, default='../inpainting-inuse/1010000.pth')
+parser.add_argument('--snapshot', type=str, default='../inpainting-inuse/saves-data-aug-lm/ckpt/5810000.pth')
 parser.add_argument('--image_size', type=int, default=256)
 args = parser.parse_args()
 
 device = torch.device('cuda')
 
 size = (args.image_size, args.image_size)
-img_transform = transforms.Compose(
-    [transforms.Resize(size=size), transforms.ToTensor(),
-     transforms.Normalize(mean=opt.MEAN, std=opt.STD)])
-mask_transform = transforms.Compose(
-    [transforms.Resize(size=size), transforms.ToTensor()])
+#size = (178,218)
+#img_transform = transforms.Compose(
+#    [transforms.Resize(size=size),
+#     transforms.ToTensor(),
+#     transforms.Normalize(mean=opt.MEAN, std=opt.STD)])
+#mask_transform = transforms.Compose(
+#    [transforms.Resize(size=size),
+#     transforms.ToTensor()])
 
-dataset_val = Places2(args.root, args.maskroot, img_transform, mask_transform, 'demo')
+size = (args.image_size, args.image_size)
+
+img_tf = transforms.Compose(
+    [
+
+        transforms.ToTensor(),
+        transforms.Normalize(mean=opt.MEAN, std=opt.STD)
+    ]
+)
+
+mask_tf = transforms.Compose(
+    [transforms.Resize(size=size),
+     transforms.ToTensor()])
+
+
+dataset_val = Places2(args.root, args.maskroot, img_tf, mask_tf, 'demo')
 
 model = PConvUNet().to(device)
 load_ckpt(args.snapshot, [('model', model)])
