@@ -61,9 +61,10 @@ size = ( 218, 178)
 
 img_tf = transforms.Compose(
     [
-        transforms.RandomRotation(15, resample=False, expand=False),
+        transforms.Resize(size = (2180,2180)),
+        transforms.RandomResizedCrop(2180, scale=(0.8, .9), ratio=(.9, 1.1), interpolation=2),
+        transforms.RandomRotation(0, resample=False, expand=False),
         transforms.Resize(size=size),
-        transforms.RandomResizedCrop(args.image_size, scale=(0.7, .8), ratio=(.75, .76), interpolation=2),
         transforms.ToTensor()
         #transforms.Normalize(mean=opt.MEAN, std=opt.STD)
     ]
