@@ -46,14 +46,14 @@ class PreprocessDemo(torch.utils.data.Dataset):
 
 parser = argparse.ArgumentParser()
 # training options
-parser.add_argument('--root', type=str, default='/home/washbee1/phone-images')
+parser.add_argument('--root', type=str, default='/home/washbee1/celeba-kaggle-512/val_large')
 parser.add_argument('--mask_root', type=str, default='/home/washbee1/masks')
 parser.add_argument('--image_size', type=int, default=256)
 args = parser.parse_args()
 
 device = torch.device('cuda')
 
-size = ( 218, 178)
+#size = ( 218, 178)
 #img_transform = transforms.Compose(
 #    [transforms.Resize(size=size),
 #     transforms.ToTensor(),
@@ -61,12 +61,8 @@ size = ( 218, 178)
 
 img_tf = transforms.Compose(
     [
-        transforms.Resize(size = (2180,2180)),
-        transforms.RandomResizedCrop(2180, scale=(0.8, .9), ratio=(.9, 1.1), interpolation=2),
-        transforms.RandomRotation(0, resample=False, expand=False),
-        transforms.Resize(size=size),
+        transforms.Resize(size = (512,512)),
         transforms.ToTensor()
-        #transforms.Normalize(mean=opt.MEAN, std=opt.STD)
     ]
 )
 
