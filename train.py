@@ -78,9 +78,6 @@ size = (args.image_size, args.image_size)
 img_tf = transforms.Compose(
     [
         transforms.Resize(size=size),
-        transforms.RandomResizedCrop(args.image_size, scale=(0.5, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2),
-        transforms.RandomRotation(15, resample=PIL.Image.BILINEAR, expand=True),
-	    transforms.Resize(size=size),
         transforms.ToTensor(),
         transforms.Normalize(mean=opt.MEAN, std=opt.STD)
     ]
