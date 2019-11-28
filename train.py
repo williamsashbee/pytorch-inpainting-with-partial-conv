@@ -6,7 +6,7 @@ from tensorboardX import SummaryWriter
 from torch.utils import data
 from torchvision import transforms
 from tqdm import tqdm
-
+import PIL
 import opt
 from evaluation import evaluate
 from loss import InpaintingLoss
@@ -79,7 +79,8 @@ img_tf = transforms.Compose(
     [
         transforms.Resize(size=size),
         transforms.RandomResizedCrop(args.image_size, scale=(0.5, 1.0), ratio=(0.75, 1.3333333333333333), interpolation=2),
-        transforms.RandomRotation(15, resample=False, expand=False),
+        transforms.RandomRotation(15, resample=PIL.Image.BILINEAR, expand=True),
+	    transforms.Resize(size=size),
         transforms.ToTensor(),
         transforms.Normalize(mean=opt.MEAN, std=opt.STD)
     ]
@@ -131,6 +132,8 @@ for i in tqdm(range(start_iter, args.max_iter)):
         if (i + 1) % args.log_interval == 0:
             writer.add_scalar('loss_{:s}'.format(key), value.item(), i + 1)
 
+    if (i + 1) % args.log_interval == 0:
+        writer.add_scalar('loss_total',loss, i+1)
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
