@@ -16,11 +16,8 @@ import cv2
 action_list = [[0, 1], [0, -1], [1, 0], [-1, 0]]
 
 
-def random_face_rectangle(args, path, canvas,i):
+def random_face_rectangle(args, path, canvas,i,detector, predictor):
     img_size = canvas.shape[-1]
-    print("[INFO] loading facial landmark predictor...")
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor(args.shape_predictor)
 
     image = cv2.imread(path)
     image = imutils.resize(image, width=512,height=512)
@@ -53,9 +50,9 @@ def random_face_rectangle(args, path, canvas,i):
         for (_, (x, y)) in enumerate(shape):
             xyList.append((x,y))
 
-        print(xyList)
+        #print(xyList)
         xyList = sorted(xyList, key=lambda point: point[0])
-        print(xyList)
+        #print(xyList)
         sf = .5
         if len(xyList) == 5:
             i += 1
@@ -78,10 +75,10 @@ def random_face_rectangle(args, path, canvas,i):
 
             i += 1
             canvas = np.ones((args.image_size, args.image_size)).astype("i")
-            ymin = np.max(np.array([xyList[0][1],xyList[1][1],xyList[3][1],xyList[4][1],]))
+            ymin = np.min(np.array([xyList[0][1],xyList[1][1],xyList[3][1],xyList[4][1]]))
             xdiff = np.abs(xyList[3][0] - xyList[4][0])
             ymin -= int(sf*xdiff)
-            ymax = int(xyList[2][1] + sf * xdiff)
+            ymax = int(xyList[2][1] + 3.0*sf * xdiff)
             xmin = int(xyList[0][0] - sf * xdiff)
             xmax = int(xyList[4][0] + sf * xdiff)
             canvas[int(xmin):int(xmax), int(ymin):int(ymax)] = 0
@@ -98,8 +95,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--image_size', type=int, default=512)
     parser.add_argument('--N', type=int, default=10000)
-    parser.add_argument('--save_dir', type=str, default='mask-rect-large-hq-512')
-    parser.add_argument('--root', type=str, default='../../../celeba-hq-512/data1024x1024-512/data_large/train')
+    parser.add_argument('--save_dir', type=str, default='mask-FacialLandmark-hq-512-cropped')
+    parser.add_argument('--root', type=str, default='/home/washbee1/celeba-hq-crop/data1024x1024/data_large/train')
     parser.add_argument("-p", "--shape-predictor",
                     help="path to facial landmark predictor", default = "shape_predictor_5_face_landmarks.dat")
 
@@ -108,12 +105,18 @@ if __name__ == '__main__':
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
+    print("[INFO] loading facial landmark predictor...")
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor(args.shape_predictor)
+
     dataset_train = Places2(args.root, None, None, None, 'demo')
     i = 0
     for path in dataset_train.paths:
-        print(path)
+        if i > 10000:
+            break
+#        print(path)
         canvas = np.ones((args.image_size, args.image_size)).astype("i")
-        mask,i = random_face_rectangle(args,path, canvas,i)
+        mask,i = random_face_rectangle(args,path, canvas,i, detector, predictor)
         #i=cnt
-        print("save:", i, np.sum(mask))
+#        print("save:", i, np.sum(mask))
 
