@@ -61,7 +61,8 @@ def findMeans(args, paths):
                     xVals[count,ind] = x
                     yVals[count,ind] = y
                     ind+=1
-    print(xVals)
+    print(np.median(xVals,axis=0))
+    print(np.median(yVals,axis=0))
 
 
 if __name__ == '__main__':
