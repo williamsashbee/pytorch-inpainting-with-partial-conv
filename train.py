@@ -41,20 +41,23 @@ class InfiniteSampler(data.sampler.Sampler):
 
 parser = argparse.ArgumentParser()
 # training options
-parser.add_argument('--root', type=str, default='/srv/datasets/Places2')
-parser.add_argument('--mask_root', type=str, default='./masks')
+parser.add_argument('--root', type=str, default='/home/washbee1/celeba-hq-crop-2/data1024x1024')
+parser.add_argument('--mask_root', type=str, default='/home/washbee1/PycharmProjects/image_inpainting/pytorch-inpainting-with-partial-conv/masks-train-Facial-targeted-rect')
+parser.add_argument('--mask_root_train', type=str, default='/home/washbee1/PycharmProjects/image_inpainting/pytorch-inpainting-with-partial-conv/masks-train-Facial-targeted-rect')
+parser.add_argument('--mask_root_val', type=str, default='/home/washbee1/PycharmProjects/image_inpainting/pytorch-inpainting-with-partial-conv/masks-val-Facial-targeted-rect')
+parser.add_argument('--mask_root_test', type=str, default='/home/washbee1/PycharmProjects/image_inpainting/pytorch-inpainting-with-partial-conv/masks-test-Facial-targeted-rect')
 parser.add_argument('--save_dir', type=str, default='./snapshots/default')
 parser.add_argument('--log_dir', type=str, default='./logs/default')
 parser.add_argument('--lr', type=float, default=2e-4)
 parser.add_argument('--lr_finetune', type=float, default=5e-5)
-parser.add_argument('--max_iter', type=int, default=1000000)
+parser.add_argument('--max_iter', type=int, default=1000000000)
 parser.add_argument('--batch_size', type=int, default=16)
 parser.add_argument('--n_threads', type=int, default=16)
 parser.add_argument('--save_model_interval', type=int, default=50000)
-parser.add_argument('--vis_interval', type=int, default=5000)
+parser.add_argument('--vis_interval', type=int, default=100)
 parser.add_argument('--log_interval', type=int, default=10)
 parser.add_argument('--image_size', type=int, default=256)
-parser.add_argument('--resume', type=str)
+parser.add_argument('--resume', type=str, default = "../inpainting-inuse/saves-demo-centered-4/ckpt/6875000.pth" )
 parser.add_argument('--finetune', action='store_true')
 args = parser.parse_args()
 
@@ -66,6 +69,7 @@ torch.backends.cudnn.benchmark = True
 device = torch.device('cuda')
 
 if not os.path.exists(args.save_dir):
+    print(args.save_dir)
     os.makedirs('{:s}/images'.format(args.save_dir))
     os.makedirs('{:s}/ckpt'.format(args.save_dir))
 
@@ -87,8 +91,8 @@ mask_tf = transforms.Compose(
     [transforms.Resize(size=size),
      transforms.ToTensor()])
 
-dataset_train = Places2(args.root, args.mask_root, img_tf, mask_tf, 'train')
-dataset_val = Places2(args.root, args.mask_root, img_tf, mask_tf, 'val')
+dataset_train = Places2(args.root, args.mask_root_train, img_tf, mask_tf, 'train', targeted = True)
+dataset_val = Places2(args.root, args.mask_root_val, img_tf, mask_tf, 'val', targeted = True)
 
 iterator_train = iter(data.DataLoader(
     dataset_train, batch_size=args.batch_size,
