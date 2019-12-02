@@ -48,8 +48,8 @@ def demo(model, dataset, device, filename):
                 output = output.to(torch.device('cpu'))
 
                 grid = make_grid(
-                    torch.cat((unnormalize(gt_img), mask, unnormalize(output),
-                    unnormalize(gt_img*mask), unnormalize(output)), dim=0))
+                    torch.cat((unnormalize(gt_img), mask, unnormalize(gt_img*mask) ,unnormalize(output)
+                    ), dim=0))
                 save_image(grid, base+'_out.jpg')
 
 
@@ -58,7 +58,7 @@ parser = argparse.ArgumentParser()
 # training options
 parser.add_argument('--root', type=str, default='../demo-prod')
 parser.add_argument('--maskroot', type=str, default='../demo-prod/demo-masks')
-parser.add_argument('--snapshot', type=str, default='/home/washbee1/PycharmProjects/image_inpainting/targeted-training/saves-targeted-1/ckpt/6925000.pth')
+parser.add_argument('--snapshot', type=str, default='/home/washbee1/PycharmProjects/image_inpainting/targeted-training/saves-targeted-1/ckpt/6935000.pth')
 parser.add_argument('--image_size', type=int, default=256)
 args = parser.parse_args()
 
