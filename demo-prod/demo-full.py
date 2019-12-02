@@ -113,12 +113,14 @@ def crop_face(args, path, detector, predictor):
 
 def demo(model, dataset, device, filename):
     for path in dataset.paths:
+        pathbase = os.path.basename(path)
+        pathbase = os.path.splitext(pathbase)[0]
         gt_img = Image.open(path)
         gt_img = dataset.img_transform(gt_img.convert('RGB'))
+        history = []
         for maskpath in dataset.mask_paths:
             base = os.path.basename(maskpath)
             base = os.path.splitext(base)[0]
-            history = gt_img
             if base[:-2] in path:
                 mask = Image.open(maskpath)
                 mask = dataset.mask_transform(mask.convert('RGB'))
@@ -129,8 +131,6 @@ def demo(model, dataset, device, filename):
 
                 mask = torch.reshape(mask, (1, 3, 256, 256))
 
-                #                gt = torch.stack(gt)
-
                 output = None
                 with torch.no_grad():
                     output, _ = model(gt_img.to(device), mask.to(device))
@@ -140,7 +140,13 @@ def demo(model, dataset, device, filename):
                 grid = make_grid(
                     torch.cat((unnormalize(gt_img), mask, unnormalize(gt_img * mask), unnormalize(output)
                                ), dim=0))
-                save_image(grid, base + '_out.jpg')
+                #save_image(grid, base + '_out.jpg')
+
+                history.append(grid)
+
+        grid = make_grid(torch.cat((history[0],history[1],history[2]
+                             ), dim=1))
+        save_image(grid, pathbase + '_out.jpg')
 
 
 ######p1
